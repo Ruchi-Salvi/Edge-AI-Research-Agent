@@ -6,15 +6,11 @@ from langchain.llms import FakeListLLM # Updated import
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 
-# --- Use Fake LLM & Embeddings (no API keys) ---
-#llm = FakeLLM() # Updated instantiation
 llm = FakeListLLM(responses=["I have no information about that."]) # Updated instantiation
-# Added size parameter to FakeEmbeddings instantiation
 embeddings = FakeEmbeddings(size=100)
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
-# --- Simulated Research Agent ---
 def run_mock_research_agent():
     mock_docs = [
         Document(page_content="""
@@ -35,12 +31,10 @@ def run_mock_research_agent():
     vectorstore = FAISS.from_documents(chunks, embeddings)
     return vectorstore
 
-# --- Answer Drafter Agent ---
 def run_answer_drafter(query, vectorstore):
     qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=vectorstore.as_retriever())
     return qa_chain.run(query)
 
-# --- Main Flow ---
 if __name__ == "__main__":
     query = input("Enter your research query: ")
     vs = run_mock_research_agent()
