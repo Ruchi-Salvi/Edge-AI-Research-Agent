@@ -1,0 +1,49 @@
+from langchain.chains import RetrievalQA
+from langchain.vectorstores import FAISS
+from langchain.embeddings import FakeEmbeddings
+#from langchain.llms.fake import FakeLLM  # Updated import
+from langchain.llms import FakeListLLM # Updated import
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.schema import Document
+
+# --- Use Fake LLM & Embeddings (no API keys) ---
+#llm = FakeLLM() # Updated instantiation
+llm = FakeListLLM(responses=["I have no information about that."]) # Updated instantiation
+# Added size parameter to FakeEmbeddings instantiation
+embeddings = FakeEmbeddings(size=100)
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+
+# --- Simulated Research Agent ---
+def run_mock_research_agent():
+    mock_docs = [
+        Document(page_content="""
+        Edge AI refers to the deployment of artificial intelligence algorithms on devices locally at the edge of the network, rather than in a centralized cloud.
+        Trends in 2024 include ultra-low power AI chips, on-device learning, and federated learning for privacy-preserving AI in IoT.
+        """, metadata={"source": "MockSource1"}),
+        Document(page_content="""
+        The integration of AI with 5G and real-time analytics is driving Edge AI forward.
+        Use cases include smart surveillance, predictive maintenance, autonomous driving, and industrial automation.
+        """, metadata={"source": "MockSource2"}),
+        Document(page_content="""
+        Challenges include limited computational power on edge devices, data fragmentation, and model compression.
+        Tools like TinyML and lightweight transformer models are being actively developed.
+        """, metadata={"source": "MockSource3"})
+    ]
+
+    chunks = text_splitter.split_documents(mock_docs)
+    vectorstore = FAISS.from_documents(chunks, embeddings)
+    return vectorstore
+
+# --- Answer Drafter Agent ---
+def run_answer_drafter(query, vectorstore):
+    qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=vectorstore.as_retriever())
+    return qa_chain.run(query)
+
+# --- Main Flow ---
+if __name__ == "__main__":
+    query = input("Enter your research query: ")
+    vs = run_mock_research_agent()
+    final_answer = run_answer_drafter(query, vs)
+    print("\n--- Final Answer ---\n")
+    print(final_answer)
