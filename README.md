@@ -36,11 +36,3 @@ Designed without any API keys, this system is **safe to run offline**, easy to e
    |
    v
 [Final Answer + Source Attribution]
-
-## 🚀 How to Run
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/simulated-edge-ai-agent.git
-cd simulated-edge-ai-agent
